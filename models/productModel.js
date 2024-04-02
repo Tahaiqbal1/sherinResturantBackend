@@ -1,7 +1,9 @@
 import mongoose from "mongoose";
+import Counter from "../helpers/Counter.js";
 
 const productSchema = new mongoose.Schema(
   {
+    customId: Number,
     name: {
       type: String,
       required: true,
@@ -19,7 +21,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: mongoose.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
       required: true,
     },
@@ -35,4 +37,19 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Products", productSchema);
+// Pre-save hook to auto-increment the customId
+productSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: "product" },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    this.customId = counter.seq;
+    next();
+  } else {
+    next();
+  }
+});
+
+export default mongoose.model("Product", productSchema);

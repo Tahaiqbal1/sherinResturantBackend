@@ -1,24 +1,41 @@
 import slugify from "slugify";
+import fs from "fs";
 import categoryModel from "../models/categoryModel.js";
+
+// Ensure you have your model imported or defined
 
 export const createCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
+    const image = req.file; // Assuming 'req.file' is provided by a middleware like 'multer'.
+
     if (!name) {
-      return res.status(401).send({ message: "Name is required" });
+      return res.status(400).send({ message: "Name is required" });
+    }
+
+    if (!image) {
+      return res.status(400).send({ message: "Image is required" });
     }
 
     const existingCategory = await categoryModel.findOne({ name });
     if (existingCategory) {
-      return res.status(200).send({
-        success: true,
-        message: "Category already Exist",
+      return res.status(409).send({
+        message: "Category already exists",
       });
     }
-    const category = await new categoryModel({
+
+    // Convert the image buffer to a base64 string
+    const imageBase64 = `data:${
+      image.mimetype
+    };charset=utf-8;base64,${image.buffer.toString("base64")}`;
+
+    const category = new categoryModel({
       name,
       slug: slugify(name),
-    }).save();
+      image: imageBase64, // Save the image as a base64 string
+    });
+
+    await category.save();
 
     res.status(201).send({
       success: true,
@@ -26,11 +43,10 @@ export const createCategoryController = async (req, res) => {
       category,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).send({
-      success: false,
+      message: "Error while creating category",
       error,
-      message: "Error while creating",
     });
   }
 };
@@ -39,16 +55,18 @@ export const updateCategoryController = async (req, res) => {
   try {
     const { name } = req.body;
     const { id } = req.params;
+    console.log(req.body);
+
     const category = await categoryModel.findByIdAndUpdate(
       id,
       {
         name,
-        slug: slugify(name),
+        // slug: slugify(name),
       },
       { new: true }
     );
     res.status(200).send({
-      succes: true,
+      success: true,
       message: "Category Updated",
       category,
     });
@@ -61,6 +79,7 @@ export const updateCategoryController = async (req, res) => {
     });
   }
 };
+
 export const getCategoryController = async (req, res) => {
   try {
     const category = await categoryModel.find({});

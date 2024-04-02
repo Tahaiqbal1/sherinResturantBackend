@@ -4,7 +4,8 @@ import fs from "fs";
 
 export const createProductController = async (req, res) => {
   try {
-    const { name, description, price, category, quantity } = req.fields;
+    const { name, description, price, category, quantity, shipping } =
+      req.fields;
     const { photo } = req.files;
     //alidation
     switch (true) {
@@ -18,10 +19,10 @@ export const createProductController = async (req, res) => {
         return res.status(500).send({ error: "Category is Required" });
       case !quantity:
         return res.status(500).send({ error: "Quantity is Required" });
-      case photo && photo.size > 10000000:
+      case photo && photo.size > 5000000:
         return res
           .status(500)
-          .send({ error: "photo is Required and should be less then 1mb" });
+          .send({ error: "Photo is required and should be less than 5MB" });
     }
 
     const products = new productModel({ ...req.fields, slug: slugify(name) });
@@ -50,43 +51,23 @@ export const getProductController = async (req, res) => {
     const products = await productModel
       .find({})
       .populate("category")
-      // Removed .select("-photo") to include the photo field
       .limit(12)
       .sort({ createdAt: -1 });
-
-    // Convert the binary data to a base64 string for each product
-    const productsWithPhotos = products.map((product) => {
-      const photo = product.photo
-        ? {
-            ...product.photo,
-            data: `data:${
-              product.photo.contentType
-            };base64,${product.photo.data.toString("base64")}`,
-          }
-        : null;
-
-      return {
-        ...product.toObject(), // Convert the MongoDB document to a plain object
-        photo, // Include the photo with the base64 string
-      };
-    });
-
     res.status(200).send({
       success: true,
-      countTotal: productsWithPhotos.length,
-      message: "AllProducts",
-      products: productsWithPhotos,
+      counTotal: products.length,
+      message: "ALlProducts ",
+      products,
     });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error in getting products",
+      message: "Erorr in getting products",
       error: error.message,
     });
   }
 };
-
 export const getSingleProductController = async (req, res) => {
   try {
     const product = await productModel

@@ -8,15 +8,16 @@ import {
   productPhotoController,
   updateProductController,
 } from "../controllers/productController.js";
-import formidable from "express-formidable";
+import multer from "multer";
 
 const router = express.Router();
+const upload = multer({ dest: "uploads/" });
 
 router.post(
   "/create-product",
   requireSignIn,
   isAdmin,
-  formidable(),
+
   createProductController
 );
 router.get("/get-products", getProductController);
@@ -25,7 +26,6 @@ router.put(
   "/update-product/:pid",
   requireSignIn,
   isAdmin,
-  formidable(),
   updateProductController
 );
 router.get("/product-photo/:pid", productPhotoController);

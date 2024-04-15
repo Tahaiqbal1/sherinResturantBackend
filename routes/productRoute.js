@@ -13,13 +13,7 @@ import multer from "multer";
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-router.post(
-  "/create-product",
-  requireSignIn,
-  isAdmin,
-
-  createProductController
-);
+router.post("/create-product", requireSignIn, isAdmin, createProductController);
 router.get("/get-products", getProductController);
 router.get("/single-product/:slug", getSingleProductController);
 router.put(

@@ -6,6 +6,8 @@ import path from "path";
 import authRoute from "./routes/authRoute.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoute.js";
+import orderRoutes from "./routes/orderRoutes.js";
+
 import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
@@ -18,6 +20,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
 app.use(cors());
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -28,6 +31,7 @@ app.use(morgan("dev"));
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.send({

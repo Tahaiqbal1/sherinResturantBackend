@@ -92,6 +92,7 @@ export const loginController = async (req, res) => {
       success: true,
       message: "Login successfully",
       user: {
+        userId: user._id, // Include userId here
         name: user.name,
         email: user.email,
         phone: user.phone,
@@ -104,7 +105,7 @@ export const loginController = async (req, res) => {
     console.log(error);
     res.status(500).send({
       success: false,
-      message: "Error occured while login",
+      message: "Error occurred while login",
       error,
     });
   }

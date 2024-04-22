@@ -27,6 +27,33 @@ export const getAllOrdersController = async (req, res) => {
   }
 };
 
+export const getUserOrdersController = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const orders = await orderModel
+      .find({ "userDetails.userId": userId })
+      .populate("cartItems.product");
+
+    if (orders.length === 0) {
+      return res.status(200).json({
+        message: "No orders placed by this user",
+        data: [],
+      });
+    }
+
+    res.status(200).json({
+      message: "Orders for the user fetched successfully",
+      data: orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error fetching orders for the user",
+      error: error.toString(),
+    });
+  }
+};
+
 export const deleteOrderController = async (req, res) => {
   try {
     const order = await orderModel.findByIdAndDelete(req.params.id);

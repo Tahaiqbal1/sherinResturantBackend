@@ -54,6 +54,39 @@ export const getUserOrdersController = async (req, res) => {
   }
 };
 
+export const updateOrderStatusByIdController = async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const { status } = req.body;
+
+    if (!["Pending", "Processing", "Completed", "Delivered"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const updatedOrder = await orderModel.findByIdAndUpdate(
+      orderId,
+      { status: status },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.status(200).json({
+      message: "Order status updated successfully",
+      data: updatedOrder,
+    });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Error updating order status:", error);
+    res.status(500).json({
+      message: "Error updating order status",
+      error: error.toString(),
+    });
+  }
+};
+
 export const deleteOrderController = async (req, res) => {
   try {
     const order = await orderModel.findByIdAndDelete(req.params.id);

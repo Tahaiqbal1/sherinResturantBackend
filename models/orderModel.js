@@ -17,19 +17,19 @@ const orderSchema = new mongoose.Schema({
   },
   userDetails: {
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: false },
     phone: { type: String, required: true },
     address: { type: String, required: true },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
   },
   status: {
     type: String,
-    enum: ["pending", "completed", "cancelled"],
-    default: "pending",
+    enum: ["Pending", "Processing", "Completed", "Delivered"],
+    default: "Pending",
   },
   createdAt: {
     type: Date,

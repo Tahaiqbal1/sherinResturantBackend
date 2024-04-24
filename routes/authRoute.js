@@ -6,10 +6,11 @@ import {
   registerController,
   testController,
 } from "../controllers/authController.js";
-
 import { isAdmin, requireSignIn } from "../middlewares/authMiddleware.js";
+import multer from "multer";
 
 const router = express.Router();
+const upload = multer({ dest: "uploads/" });
 
 router.post("/register", registerController);
 

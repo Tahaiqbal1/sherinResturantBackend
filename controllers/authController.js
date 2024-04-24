@@ -5,60 +5,68 @@ import {
   hashPassword as hashPasswordFunction,
 } from "../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
+import multer from "multer";
+import path from "path";
 
+const userStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const userUpload = multer({ storage: userStorage });
 export const registerController = async (req, res) => {
-  try {
-    const { name, email, password, phone, address } = req.body;
+  userUpload.single("image")(req, res, async function (err) {
+    try {
+      const { name, email, password, phone, address } = req.body;
+      const userImage = req.file ? req.file.filename : undefined;
+      console.log(req.file);
+      if (!name || !email || !password || !phone || !address || !userImage) {
+        return res.status(400).json({
+          success: false,
+          message: "All fields including a user image are required.",
+        });
+      }
 
-    if (!name) {
-      return res.send({ message: "Name is Required" });
-    }
-    if (!email) {
-      return res.send({ message: "Email is Required" });
-    }
-    if (!password) {
-      return res.send({ message: "Password is Required" });
-    }
-    if (!phone) {
-      return res.send({ message: "Phone is Required" });
-    }
-    if (!address) {
-      return res.send({ message: "Address is Required" });
-    }
+      const existingUser = await userModel.findOne({ email }).lean().exec();
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: "Email already registered, please login.",
+        });
+      }
 
-    const existingUser = await userModel.findOne({ email }).lean().exec();
+      const hashedPassword = await hashPasswordFunction(password);
 
-    if (existingUser) {
-      return res.status(409).send({
+      const user = new userModel({
+        name,
+        email,
+        phone,
+        address,
+        password: hashedPassword,
+        image: userImage,
+      });
+
+      await user.save();
+
+      res.status(201).json({
+        success: true,
+        message: "User Registered Successfully",
+        userId: user._id,
+        imagePath: userImage,
+      });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({
         success: false,
-        message: "Email already registered, please login.",
+        message: "Error while registering user",
+        error: error.message,
       });
     }
-
-    const hashedPassword = await hashPasswordFunction(password);
-    const user = new userModel({
-      name,
-      email,
-      phone,
-      address,
-      password: hashedPassword,
-    });
-
-    await user.save();
-
-    res.status(201).send({
-      success: true,
-      message: "User Registered Successfully",
-      userId: user._id,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send({
-      success: false,
-      message: "Error while registering user",
-      error: error.message,
-    });
-  }
+  });
 };
 
 export const loginController = async (req, res) => {
@@ -98,6 +106,7 @@ export const loginController = async (req, res) => {
         phone: user.phone,
         address: user.address,
         role: user.role,
+        image: user.image,
       },
       token,
     });

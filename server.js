@@ -7,7 +7,7 @@ import authRoute from "./routes/authRoute.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoute.js";
 import orderRoutes from "./routes/orderRoutes.js";
-
+import serviceRoute from "./routes/services.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
@@ -32,6 +32,7 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/category", categoryRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/orders", orderRoutes);
+app.use("/api/services", serviceRoute);
 
 app.get("/", (req, res) => {
   res.send({

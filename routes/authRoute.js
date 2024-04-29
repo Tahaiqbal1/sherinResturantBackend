@@ -1,7 +1,7 @@
 import express from "express";
-// Import the actual named export 'registerController' from your controller
 import {
   forgotPasswordController,
+  getAllUsersController,
   loginController,
   registerController,
   testController,
@@ -19,6 +19,8 @@ router.post("/login", loginController);
 router.post("/forgot-password", forgotPasswordController);
 
 router.get("/admin-auth", requireSignIn, isAdmin, testController);
+
+router.get("/all-users", getAllUsersController);
 
 router.get("/test", requireSignIn, isAdmin, (req, res) => {
   res.status(200).send({ ok: true });

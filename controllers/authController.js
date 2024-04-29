@@ -40,7 +40,6 @@ export const registerController = async (req, res) => {
       }
 
       const hashedPassword = await hashPasswordFunction(password);
-
       const user = new userModel({
         name,
         email,
@@ -195,6 +194,23 @@ export const updateProfileController = async (req, res) => {
       success: false,
       message: "Error While Update Profile",
       error,
+    });
+  }
+};
+
+export const getAllUsersController = async (req, res) => {
+  try {
+    const users = await userModel.find({}).select("-password");
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching users",
+      error: error.message,
     });
   }
 };

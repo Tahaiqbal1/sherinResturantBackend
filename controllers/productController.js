@@ -43,7 +43,6 @@ export const createProductController = async (req, res) => {
           .send({ error: "All fields including photo are required" });
       }
 
-      // Proceed with your logic to save the product
       const product = new productModel({
         name,
         description,
@@ -51,7 +50,7 @@ export const createProductController = async (req, res) => {
         category,
         quantity,
         shipping,
-        photo, // Assuming you are storing the filename or path
+        photo,
         slug: slugify(name),
       });
 

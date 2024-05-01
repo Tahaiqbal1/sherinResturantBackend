@@ -214,3 +214,28 @@ export const getAllUsersController = async (req, res) => {
     });
   }
 };
+
+export const deleteUserByIdController = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const result = await userModel.findByIdAndDelete(userId);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "User successfully deleted",
+      data: result,
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while deleting user",
+      error: error.message,
+    });
+  }
+};

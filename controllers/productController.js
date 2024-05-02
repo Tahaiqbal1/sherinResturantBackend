@@ -16,58 +16,73 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 export const createProductController = async (req, res) => {
-  upload.fields([
-    { name: "photo", maxCount: 1 },
-    // Add other fields if needed
-  ])(req, res, async function (err) {
-    if (err instanceof multer.MulterError) {
-      // A Multer error occurred when uploading.
-      return res.status(400).send({ error: err.message });
-    } else if (err) {
-      // An unknown error occurred when uploading.
-      return res.status(500).send({ error: err.message });
-    }
-
-    // If this point is reached, file(s) have been uploaded successfully.
-    try {
-      const { name, description, price, category, quantity, shipping } =
-        req.body;
-      const photo = req.files["photo"]
-        ? req.files["photo"][0].filename
-        : undefined;
-
-      // Validation
-      if (!name || !description || !price || !category || !quantity || !photo) {
-        return res
-          .status(400)
-          .send({ error: "All fields including photo are required" });
+  upload.fields([{ name: "photo", maxCount: 1 }])(
+    req,
+    res,
+    async function (err) {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).send({ error: err.message });
+      } else if (err) {
+        return res.status(500).send({ error: err.message });
       }
 
-      const product = new productModel({
-        name,
-        description,
-        price,
-        category,
-        quantity,
-        shipping,
-        photo,
-        slug: slugify(name),
-      });
+      try {
+        const {
+          name,
+          description,
+          price,
+          category,
+          quantity,
+          shipping,
+          discount,
+        } = req.body;
+        const photo = req.files["photo"]
+          ? req.files["photo"][0].filename
+          : undefined;
 
-      await product.save();
-      res.status(201).send({
-        success: true,
-        message: "Product Created Successfully",
-        product,
-      });
-    } catch (error) {
-      res.status(500).send({
-        success: false,
-        error: error.message,
-        message: "Error in creating product",
-      });
+        // Validation
+        if (
+          !name ||
+          !description ||
+          !price ||
+          !category ||
+          !quantity ||
+          !photo ||
+          (discount !== undefined && isNaN(Number(discount)))
+        ) {
+          return res.status(400).send({
+            error:
+              "All fields including photo are required, and discount must be a number if provided.",
+          });
+        }
+
+        const product = new productModel({
+          name,
+          description,
+          price,
+          category,
+          quantity,
+          shipping,
+          photo,
+          discount: discount ? Number(discount) : 0,
+          slug: slugify(name),
+        });
+
+        await product.save();
+        res.status(201).send({
+          success: true,
+          message: "Product Created Successfully",
+          product,
+        });
+      } catch (error) {
+        res.status(500).send({
+          success: false,
+          error: error.message,
+          message: "Error in creating product",
+        });
+      }
     }
-  });
+  );
 };
 
 export const getProductController = async (req, res) => {
@@ -161,7 +176,7 @@ export const updateProductController = async (req, res) => {
     }
 
     try {
-      const { name, description, price, category, quantity, shipping } =
+      const { name, description, price, category, quantity, discount } =
         req.body;
       let updateData = {
         name,
@@ -169,7 +184,7 @@ export const updateProductController = async (req, res) => {
         price,
         category,
         quantity,
-        shipping,
+        discount,
         // Only update slug if the name is changed
         ...(name && { slug: slugify(name) }),
       };
@@ -181,7 +196,14 @@ export const updateProductController = async (req, res) => {
       }
 
       // Validation
-      if (!name || !description || !price || !category || !quantity) {
+      if (
+        !name ||
+        !description ||
+        !price ||
+        !category ||
+        !quantity ||
+        !discount
+      ) {
         return res.status(400).send({ error: "All fields are required" });
       }
 

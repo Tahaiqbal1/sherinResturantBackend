@@ -32,7 +32,7 @@ const productSchema = new mongoose.Schema(
     photo: {
       type: String,
     },
-    discount: {
+    discountPrice: {
       type: Number,
       default: 0,
     },

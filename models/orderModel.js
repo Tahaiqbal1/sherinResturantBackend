@@ -15,11 +15,29 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  gst: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  deliverycharges: {
+    type: String,
+    required: false,
+  },
+  deliveryaddress: {
+    type: String,
+    required: false,
+  },
+  discount: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
   userDetails: {
     name: { type: String, required: true },
     email: { type: String, required: false },
     phone: { type: String, required: true },
-    address: { type: String, required: true },
+    address: { type: String, required: false },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

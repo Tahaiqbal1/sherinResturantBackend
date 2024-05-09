@@ -13,7 +13,8 @@ const settingsSchema = new mongoose.Schema({
   },
   deliveryCharges: {
     type: Number,
-    required: false,
+    required: true,
+    default: 0,
   },
 });
 

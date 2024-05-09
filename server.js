@@ -9,6 +9,7 @@ import productRoutes from "./routes/productRoute.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import settingRoutes from "./routes/settingRoutes.js";
 import serviceRoute from "./routes/services.js";
+import clientRoutes from "./routes/clientRoutes.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
@@ -22,8 +23,8 @@ connectDB();
 
 const app = express();
 
-// app.use(cors());
-app.use(cors({ origin: ["https://sh.fayazk.com"] }));
+app.use(cors());
+// app.use(cors({ origin: ["https://sh.fayazk.com"] }));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.json());
@@ -36,6 +37,7 @@ app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/orders", orderRoutes);
 app.use("/api/services", serviceRoute);
 app.use("/api/v1/settings", settingRoutes);
+app.use("/api/v1/clients", clientRoutes);
 
 app.get("/", (req, res) => {
   res.send({

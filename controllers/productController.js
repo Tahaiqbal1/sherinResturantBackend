@@ -1,7 +1,6 @@
 import slugify from "slugify";
 import productModel from "../models/productModel.js";
 import multer from "multer";
-import fs from "fs";
 import path from "path";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -34,7 +33,7 @@ export const createProductController = async (req, res) => {
           category,
           quantity,
           shipping,
-          discountPrice, // Renamed from 'discount' to 'discountPrice'
+          discountPrice,
         } = req.body;
         const photo = req.files["photo"]
           ? req.files["photo"][0].filename
@@ -48,7 +47,7 @@ export const createProductController = async (req, res) => {
           !category ||
           !quantity ||
           !photo ||
-          (discountPrice !== undefined && isNaN(Number(discountPrice))) // Updated to check 'discountPrice'
+          (discountPrice !== undefined && isNaN(Number(discountPrice)))
         ) {
           return res.status(400).send({
             error:

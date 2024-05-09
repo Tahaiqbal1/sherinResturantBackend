@@ -22,8 +22,8 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
-// app.use(cors({ origin: ["https://sh.fayazk.com"] }));
+// app.use(cors());
+app.use(cors({ origin: ["https://sh.fayazk.com"] }));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.json());

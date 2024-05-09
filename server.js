@@ -23,8 +23,8 @@ connectDB();
 
 const app = express();
 
-// app.use(cors());
-app.use(cors({ origin: ["https://sh.fayazk.com"] }));
+// Setup CORS to allow specific origins
+app.use(cors({ origin: ["https://sh.fayazk.com", "http://localhost:3000"] }));
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.json());
@@ -45,8 +45,14 @@ app.get("/", (req, res) => {
   });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
+
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
-  console.log(`Server Running on ${PORT}`.bgCyan.white);
+  console.log(`Server running on port ${PORT}`);
 });

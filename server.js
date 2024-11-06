@@ -13,6 +13,7 @@ import clientRoutes from "./routes/clientRoutes.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
+import  backupDatabase  from "./backup.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,6 +23,9 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Backup database on server startup
+backupDatabase();
 
 // Setup CORS to allow specific origins
 app.use(cors({ origin: ["https://sh.fayazk.com", "http://localhost:3000"] }));

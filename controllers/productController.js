@@ -2,17 +2,7 @@ import slugify from "slugify";
 import productModel from "../models/productModel.js";
 import multer from "multer";
 import path from "path";
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/"); // Make sure this uploads directory exists
-  },
-  filename: function (req, file, cb) {
-    // You can use the original name or add a timestamp for uniqueness
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage: storage });
+import upload from "../config/multerConfig.js"
 
 export const createProductController = async (req, res) => {
   upload.fields([{ name: "photo", maxCount: 1 }])(

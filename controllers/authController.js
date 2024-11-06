@@ -5,21 +5,12 @@ import {
   hashPassword as hashPasswordFunction,
 } from "../helpers/authHelper.js";
 import JWT from "jsonwebtoken";
-import multer from "multer";
 import path from "path";
+import upload from "../config/multerConfig.js"
 
-const userStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
 
-const userUpload = multer({ storage: userStorage });
 export const registerController = async (req, res) => {
-  userUpload.single("image")(req, res, async function (err) {
+  upload.single("image")(req, res, async function (err) {
     try {
       const { name, email, password, phone, address } = req.body;
       const userImage = req.file ? req.file.filename : undefined;

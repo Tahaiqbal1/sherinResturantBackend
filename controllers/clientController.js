@@ -1,18 +1,8 @@
 import multer from "multer";
 import clientModel from "../models/clientModel.js"; // Adjust this path as necessary
 import path from "path";
+import upload from "../config/multerConfig.js"
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
-
-const upload = multer({ storage: storage });
-export { upload }; // Export for use in the route definitions
 
 export const createClientController = async (req, res) => {
   upload.single("photo")(req, res, async function (err) {
